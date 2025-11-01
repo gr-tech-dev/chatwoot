@@ -5,6 +5,7 @@ on:
 
 jobs:
   publish-code-space-image:
+    if: false
     runs-on: ubuntu-latest
 
     steps:

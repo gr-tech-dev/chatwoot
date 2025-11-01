@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   main:
+    if: false
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:

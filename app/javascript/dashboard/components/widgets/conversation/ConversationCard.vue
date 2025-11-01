@@ -63,6 +63,8 @@ const chatMetadata = computed(() => props.chat.meta || {});
 
 const assignee = computed(() => chatMetadata.value.assignee || {});
 
+const assignedTeam = computed(() => chatMetadata.value.team || {});
+
 const senderId = computed(() => chatMetadata.value.sender?.id);
 
 const currentContact = computed(() => {
@@ -307,6 +309,13 @@ const deleteConversation = () => {
           >
             <fluent-icon icon="person" size="12" class="text-n-slate-11" />
             {{ assignee.name }}
+          </span>
+          <span
+            v-if="showAssignee && assignedTeam.name"
+            class="text-n-slate-11 text-xs font-medium leading-3 py-0.5 px-0 inline-flex items-center truncate gap-1"
+          >
+            <fluent-icon icon="people-team" size="14" class="text-n-slate-11" />
+            {{ assignedTeam.name }}
           </span>
           <PriorityMark :priority="chat.priority" class="flex-shrink-0" />
         </div>
