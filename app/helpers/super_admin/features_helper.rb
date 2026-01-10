@@ -10,7 +10,7 @@ module SuperAdmin::FeaturesHelper
     if plan == 'premium'
       "You are currently on the <span class='font-semibold'>#{plan}</span> plan with <span class='font-semibold'>#{quantity} agents</span>."
     else
-      "You are currently on the <span class='font-semibold'>#{plan}</span> edition plan."
+      "You are currently on the <span class='font-semibold'>#{plan}</span> edition trem plan."
     end
   end
 end
