@@ -275,6 +275,12 @@
 /api/v1/accounts/{account_id}/contacts/{id}/contactable_inboxes:
   $ref: ./application/contactable_inboxes/get.yml
 
+# Contact Merge
+/api/v1/accounts/{account_id}/actions/contact_merge:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  post:
+    $ref: ./application/contacts/merge.yml
 
 # Automation Rule
 /api/v1/accounts/{account_id}/automation_rules:
@@ -388,6 +394,15 @@
     $ref: ./application/conversation/labels/index.yml
   post:
     $ref: ./application/conversation/labels/create.yml
+
+# Conversation Reporting Events
+
+/api/v1/accounts/{account_id}/conversations/{conversation_id}/reporting_events:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+    - $ref: '#/components/parameters/conversation_id'
+  get:
+    $ref: ./application/conversation/reporting_events.yml
 
 # Inboxes
 /api/v1/accounts/{account_id}/inboxes:
@@ -534,6 +549,13 @@
     $ref: ./application/webhooks/delete.yml
 
 ### Reports
+
+# Account Reporting Events
+/api/v1/accounts/{account_id}/reporting_events:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  get:
+    $ref: ./application/reporting_events/index.yml
 
 # List
 /api/v2/accounts/{account_id}/reports:

@@ -9,11 +9,14 @@ import { useI18n } from 'vue-i18n';
 import { useStorage } from '@vueuse/core';
 import { useSidebarKeyboardShortcuts } from './useSidebarKeyboardShortcuts';
 import { vOnClickOutside } from '@vueuse/components';
+import { emitter } from 'shared/helpers/mitt';
+import { BUS_EVENTS } from 'shared/constants/busEvents';
 
 import Button from 'dashboard/components-next/button/Button.vue';
 import SidebarGroup from './SidebarGroup.vue';
 import SidebarProfileMenu from './SidebarProfileMenu.vue';
 import SidebarChangelogCard from './SidebarChangelogCard.vue';
+import YearInReviewBanner from '../year-in-review/YearInReviewBanner.vue';
 import ChannelLeaf from './ChannelLeaf.vue';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
 import Logo from 'next/icon/Logo.vue';
@@ -94,6 +97,15 @@ const sortedInboxes = computed(() =>
 const closeMobileSidebar = () => {
   if (!props.isMobileSidebarOpen) return;
   emit('closeMobileSidebar');
+};
+
+const onComposeOpen = toggleFn => {
+  toggleFn();
+  emitter.emit(BUS_EVENTS.NEW_CONVERSATION_MODAL, true);
+};
+
+const onComposeClose = () => {
+  emitter.emit(BUS_EVENTS.NEW_CONVERSATION_MODAL, false);
 };
 
 const newReportRoutes = () => [
@@ -221,26 +233,70 @@ const menuItems = computed(() => {
       name: 'Captain',
       icon: 'i-woot-captain',
       label: t('SIDEBAR.CAPTAIN'),
+      activeOn: ['captain_assistants_create_index'],
       children: [
         {
-          name: 'Assistants',
-          label: t('SIDEBAR.CAPTAIN_ASSISTANTS'),
-          to: accountScopedRoute('captain_assistants_index'),
+          name: 'FAQs',
+          label: t('SIDEBAR.CAPTAIN_RESPONSES'),
+          activeOn: [
+            'captain_assistants_responses_index',
+            'captain_assistants_responses_pending',
+          ],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_assistants_responses_index',
+          }),
         },
         {
           name: 'Documents',
           label: t('SIDEBAR.CAPTAIN_DOCUMENTS'),
-          to: accountScopedRoute('captain_documents_index'),
+          activeOn: ['captain_assistants_documents_index'],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_assistants_documents_index',
+          }),
         },
         {
-          name: 'Responses',
-          label: t('SIDEBAR.CAPTAIN_RESPONSES'),
-          to: accountScopedRoute('captain_responses_index'),
+          name: 'Scenarios',
+          label: t('SIDEBAR.CAPTAIN_SCENARIOS'),
+          activeOn: ['captain_assistants_scenarios_index'],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_assistants_scenarios_index',
+          }),
+        },
+        {
+          name: 'Playground',
+          label: t('SIDEBAR.CAPTAIN_PLAYGROUND'),
+          activeOn: ['captain_assistants_playground_index'],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_assistants_playground_index',
+          }),
+        },
+        {
+          name: 'Inboxes',
+          label: t('SIDEBAR.CAPTAIN_INBOXES'),
+          activeOn: ['captain_assistants_inboxes_index'],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_assistants_inboxes_index',
+          }),
         },
         {
           name: 'Tools',
           label: t('SIDEBAR.CAPTAIN_TOOLS'),
-          to: accountScopedRoute('captain_tools_index'),
+          activeOn: ['captain_tools_index'],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_tools_index',
+          }),
+        },
+        {
+          name: 'Settings',
+          label: t('SIDEBAR.CAPTAIN_SETTINGS'),
+          activeOn: [
+            'captain_assistants_settings_index',
+            'captain_assistants_guidelines_index',
+            'captain_assistants_guardrails_index',
+          ],
+          to: accountScopedRoute('captain_assistants_index', {
+            navigationPath: 'captain_assistants_settings_index',
+          }),
         },
       ],
     },
@@ -304,6 +360,23 @@ const menuItems = computed(() => {
               'contacts_edit_label',
             ],
           })),
+        },
+      ],
+    },
+    {
+      name: 'Companies',
+      label: t('SIDEBAR.COMPANIES'),
+      icon: 'i-lucide-building-2',
+      children: [
+        {
+          name: 'All Companies',
+          label: t('SIDEBAR.ALL_COMPANIES'),
+          to: accountScopedRoute(
+            'companies_dashboard_index',
+            {},
+            { page: 1, search: undefined }
+          ),
+          activeOn: ['companies_dashboard_index'],
         },
       ],
     },
@@ -562,14 +635,14 @@ const menuItems = computed(() => {
             {{ searchShortcut }}
           </span>
         </RouterLink>
-        <ComposeConversation align-position="right">
+        <ComposeConversation align-position="right" @close="onComposeClose">
           <template #trigger="{ toggle }">
             <Button
               icon="i-lucide-pen-line"
               color="slate"
               size="sm"
               class="!h-7 !bg-n-solid-3 dark:!bg-n-black/30 !outline-n-weak !text-n-slate-11"
-              @click="toggle"
+              @click="onComposeOpen(toggle)"
             />
           </template>
         </ComposeConversation>
@@ -590,6 +663,7 @@ const menuItems = computed(() => {
       <div
         class="pointer-events-none absolute inset-x-0 -top-[31px] h-8 bg-gradient-to-t from-n-solid-2 to-transparent"
       />
+      <YearInReviewBanner />
       <SidebarChangelogCard
         v-if="isOnChatwootCloud && !isACustomBrandedInstance"
       />
